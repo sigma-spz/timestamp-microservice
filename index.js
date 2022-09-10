@@ -4,6 +4,8 @@
 // init project
 var express = require('express');
 var app = express();
+const port = 3000;
+const dateHandler = require('./date_handler');
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -25,32 +27,9 @@ app.get("/api/hello", function (req, res) {
 });
 
 
-app.get("/api/:date?", (req, res)=> {
-    
-    const validDateFormat = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$|^\d{13}$/m;
-
-    const enteredDate = req.params.date;
-    console.log({ input: req.params.date, type: typeof(req.params.date)} );
-    
-    if (typeof(enteredDate) === "undefined" || enteredDate.match(/\s+/) ) {
-	
-	const currentDate = new Date().toUTCString();
-	res.json({ unix: Date.parse(currentDate), utc: currentDate})
-    } else if (enteredDate.match(validDateFormat)) {
-	
-	const parsedDate = new Date(enteredDate).toString() === "Invalid Date"
-	      ? new Date( parseInt(enteredDate) ).toUTCString()
-	      : new Date(enteredDate).toUTCString();
-	const unixDate = Date.parse(parsedDate);
-	console.log({ parsedDate: parsedDate});
-	res.json({unix: unixDate, utc: parsedDate});
-    } else {
-	
-	res.json( {error: "Invalid Date"});
-    }
-});
+app.get("/api/:date?", dateHandler.DateParser);
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
+var listener = app.listen(port, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
